@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
-import 'signup_screen.dart';
 
-class LoginScreen extends StatefulWidget {
+class SignUpScreen extends StatefulWidget {
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final AuthService _authService = AuthService();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -18,11 +18,14 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _usernameController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+  Future<void> _handleSignUp() async {
+    if (_emailController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _usernameController.text.isEmpty) {
       setState(() {
         _errorMessage = 'الرجاء ملء جميع الحقول';
       });
@@ -35,20 +38,20 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final user = await _authService.login(
+      final user = await _authService.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text,
+        username: _usernameController.text.trim(),
       );
 
       if (user != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تم الدخول بنجاح!')),
+          SnackBar(content: Text('تم التسجيل بنجاح!')),
         );
-        // يمكن الانتقال إلى الصفحة الرئيسية هنا
         Navigator.pop(context);
       } else {
         setState(() {
-          _errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+          _errorMessage = 'فشل التسجيل، حاول مرة أخرى';
         });
       }
     } catch (e) {
@@ -65,40 +68,36 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('إنشاء حساب جديد'),
+        backgroundColor: Color(0xFF6A1B9A),
+      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(height: 80),
-            // الشعار
-            Container(
-              alignment: Alignment.center,
-              child: Icon(
-                Icons.play_circle_fill,
-                size: 80,
-                color: Color(0xFF6A1B9A),
-              ),
-            ),
-            SizedBox(height: 20),
+            SizedBox(height: 40),
             Text(
-              'REX',
+              'اضم إلينا الآن',
               style: TextStyle(
-                fontSize: 36,
+                fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF6A1B9A),
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 40),
-            Text(
-              'تسجيل الدخول',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+            SizedBox(height: 30),
+            // اسم المستخدم
+            TextField(
+              controller: _usernameController,
+              decoration: InputDecoration(
+                labelText: 'اسم المستخدم',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.person),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 16),
             // البريد الإلكتروني
             TextField(
               controller: _emailController,
@@ -135,9 +134,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             SizedBox(height: 24),
-            // زر الدخول
+            // زر التسجيل
             ElevatedButton(
-              onPressed: _isLoading ? null : _handleLogin,
+              onPressed: _isLoading ? null : _handleSignUp,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF6A1B9A),
                 padding: EdgeInsets.symmetric(vertical: 14),
@@ -145,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: _isLoading
                   ? CircularProgressIndicator(color: Colors.white)
                   : Text(
-                      'تسجيل الدخول',
+                      'إنشاء الحساب',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -154,33 +153,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
             ),
             SizedBox(height: 16),
-            // إنسى كلمة المرور
-            Center(
-              child: TextButton(
-                onPressed: () {},
-                child: Text(
-                  'هل نسيت كلمة المرور؟',
-                  style: TextStyle(color: Color(0xFF6A1B9A)),
-                ),
-              ),
-            ),
-            SizedBox(height: 32),
-            Divider(),
-            SizedBox(height: 16),
-            // التسجيل الجديد
+            // الذهاب للدخول
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('ليس لديك حساب؟ '),
+                Text('هل لديك حساب بالفعل؟ '),
                 TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SignUpScreen()),
-                    );
-                  },
+                  onPressed: () => Navigator.pop(context),
                   child: Text(
-                    'إنشاء حساب',
+                    'تسجيل الدخول',
                     style: TextStyle(
                       color: Color(0xFF6A1B9A),
                       fontWeight: FontWeight.bold,
