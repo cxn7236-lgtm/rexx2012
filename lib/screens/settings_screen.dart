@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'edit_profile_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -19,7 +20,14 @@ class SettingsScreen extends StatelessWidget {
               "تعديل الملف الشخصي",
               style: TextStyle(color: Colors.white),
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const EditProfileScreen(),
+                ),
+              );
+            },
           ),
           const Divider(color: Colors.grey),
 
